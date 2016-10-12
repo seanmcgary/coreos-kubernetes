@@ -189,10 +189,11 @@ func (c Cluster) Config() (*Config, error) {
 		}
 	}
 
+	/*
 	var err error
 	if config.AMI, err = getAMI(config.Region, config.ReleaseChannel); err != nil {
 		return nil, fmt.Errorf("failed getting AMI for config: %v", err)
-	}
+	}*/
 
 	//Set logical name constants
 	config.VPCLogicalName = vpcLogicalName
@@ -482,18 +483,6 @@ func (c Cluster) valid() error {
 	if c.ClusterName == "" {
 		return errors.New("clusterName must be set")
 	}
-	if c.KMSKeyARN == "" {
-		return errors.New("kmsKeyArn must be set")
-	}
-
-	if c.VPCID == "" && c.RouteTableID != "" {
-		return errors.New("vpcId must be specified if routeTableId is specified")
-	}
-
-	_, vpcNet, err := net.ParseCIDR(c.VPCCIDR)
-	if err != nil {
-		return fmt.Errorf("invalid vpcCIDR: %v", err)
-	}
 
 	controllerIPAddr := net.ParseIP(c.ControllerIP)
 	if controllerIPAddr == nil {
@@ -501,18 +490,9 @@ func (c Cluster) valid() error {
 	}
 
 	if len(c.Subnets) == 0 {
-		if c.AvailabilityZone == "" {
-			return fmt.Errorf("availabilityZone must be set")
-		}
 		_, instanceCIDR, err := net.ParseCIDR(c.InstanceCIDR)
 		if err != nil {
 			return fmt.Errorf("invalid instanceCIDR: %v", err)
-		}
-		if !vpcNet.Contains(instanceCIDR.IP) {
-			return fmt.Errorf("vpcCIDR (%s) does not contain instanceCIDR (%s)",
-				c.VPCCIDR,
-				c.InstanceCIDR,
-			)
 		}
 		if !instanceCIDR.Contains(controllerIPAddr) {
 			return fmt.Errorf("instanceCIDR (%s) does not contain controllerIP (%s)",
@@ -524,27 +504,14 @@ func (c Cluster) valid() error {
 		if c.InstanceCIDR != "" {
 			return fmt.Errorf("The top-level instanceCIDR(%s) must be empty when subnets are specified", c.InstanceCIDR)
 		}
-		if c.AvailabilityZone != "" {
-			return fmt.Errorf("The top-level availabilityZone(%s) must be empty when subnets are specified", c.AvailabilityZone)
-		}
 
 		var instanceCIDRs = make([]*net.IPNet, 0)
 		for i, subnet := range c.Subnets {
-			if subnet.AvailabilityZone == "" {
-				return fmt.Errorf("availabilityZone must be set for subnet #%d", i)
-			}
 			_, instanceCIDR, err := net.ParseCIDR(subnet.InstanceCIDR)
 			if err != nil {
 				return fmt.Errorf("invalid instanceCIDR for subnet #%d: %v", i, err)
 			}
 			instanceCIDRs = append(instanceCIDRs, instanceCIDR)
-			if !vpcNet.Contains(instanceCIDR.IP) {
-				return fmt.Errorf("vpcCIDR (%s) does not contain instanceCIDR (%s) for subnet #%d",
-					c.VPCCIDR,
-					c.InstanceCIDR,
-					i,
-				)
-			}
 		}
 
 		controllerInstanceCidrExists := false
@@ -578,12 +545,6 @@ func (c Cluster) valid() error {
 	if err != nil {
 		return fmt.Errorf("invalid serviceCIDR: %v", err)
 	}
-	if cidrOverlap(serviceNet, vpcNet) {
-		return fmt.Errorf("vpcCIDR (%s) overlaps with serviceCIDR (%s)", c.VPCCIDR, c.ServiceCIDR)
-	}
-	if cidrOverlap(podNet, vpcNet) {
-		return fmt.Errorf("vpcCIDR (%s) overlaps with podCIDR (%s)", c.VPCCIDR, c.PodCIDR)
-	}
 	if cidrOverlap(serviceNet, podNet) {
 		return fmt.Errorf("serviceCIDR (%s) overlaps with podCIDR (%s)", c.ServiceCIDR, c.PodCIDR)
 	}
@@ -603,34 +564,6 @@ func (c Cluster) valid() error {
 
 	if dnsServiceIPAddr.Equal(kubernetesServiceIPAddr) {
 		return fmt.Errorf("dnsServiceIp conflicts with kubernetesServiceIp (%s)", dnsServiceIPAddr)
-	}
-
-	if c.ControllerRootVolumeType == "io1" {
-		if c.ControllerRootVolumeIOPS < 100 || c.ControllerRootVolumeIOPS > 2000 {
-			return fmt.Errorf("invalid controllerRootVolumeIOPS: %d", c.ControllerRootVolumeIOPS)
-		}
-	} else {
-		if c.ControllerRootVolumeIOPS != 0 {
-			return fmt.Errorf("invalid controllerRootVolumeIOPS for volume type '%s': %d", c.ControllerRootVolumeType, c.ControllerRootVolumeIOPS)
-		}
-
-		if c.ControllerRootVolumeType != "standard" && c.ControllerRootVolumeType != "gp2" {
-			return fmt.Errorf("invalid controllerRootVolumeType: %s", c.ControllerRootVolumeType)
-		}
-	}
-
-	if c.WorkerRootVolumeType == "io1" {
-		if c.WorkerRootVolumeIOPS < 100 || c.WorkerRootVolumeIOPS > 2000 {
-			return fmt.Errorf("invalid workerRootVolumeIOPS: %d", c.WorkerRootVolumeIOPS)
-		}
-	} else {
-		if c.WorkerRootVolumeIOPS != 0 {
-			return fmt.Errorf("invalid workerRootVolumeIOPS for volume type '%s': %d", c.WorkerRootVolumeType, c.WorkerRootVolumeIOPS)
-		}
-
-		if c.WorkerRootVolumeType != "standard" && c.WorkerRootVolumeType != "gp2" {
-			return fmt.Errorf("invalid workerRootVolumeType: %s", c.WorkerRootVolumeType)
-		}
 	}
 
 	return nil
