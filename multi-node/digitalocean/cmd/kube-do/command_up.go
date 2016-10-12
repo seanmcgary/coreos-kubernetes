@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/coreos/coreos-kubernetes/multi-node/aws/pkg/cluster"
-	"github.com/coreos/coreos-kubernetes/multi-node/aws/pkg/config"
+	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/cluster"
+	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/config"
 	"github.com/spf13/cobra"
 )
 

@@ -19,7 +19,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms"
 
 	"github.com/coreos/coreos-cloudinit/config/validate"
-	"github.com/coreos/coreos-kubernetes/multi-node/aws/pkg/coreosutil"
+	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/coreosutil"
 	"github.com/coreos/go-semver/semver"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -110,23 +110,13 @@ func ClusterFromBytes(data []byte) (*Cluster, error) {
 type Cluster struct {
 	ClusterName              string            `yaml:"clusterName,omitempty"`
 	ExternalDNSName          string            `yaml:"externalDNSName,omitempty"`
-	KeyName                  string            `yaml:"keyName,omitempty"`
+	KeyId                    string            `yaml:"keyId,omitempty"`
 	Region                   string            `yaml:"region,omitempty"`
-	AvailabilityZone         string            `yaml:"availabilityZone,omitempty"`
 	ReleaseChannel           string            `yaml:"releaseChannel,omitempty"`
 	ControllerInstanceType   string            `yaml:"controllerInstanceType,omitempty"`
-	ControllerRootVolumeType string            `yaml:"controllerRootVolumeType,omitempty"`
-	ControllerRootVolumeIOPS int               `yaml:"controllerRootVolumeIOPS,omitempty"`
-	ControllerRootVolumeSize int               `yaml:"controllerRootVolumeSize,omitempty"`
+
 	WorkerCount              int               `yaml:"workerCount,omitempty"`
 	WorkerInstanceType       string            `yaml:"workerInstanceType,omitempty"`
-	WorkerRootVolumeType     string            `yaml:"workerRootVolumeType,omitempty"`
-	WorkerRootVolumeIOPS     int               `yaml:"workerRootVolumeIOPS,omitempty"`
-	WorkerRootVolumeSize     int               `yaml:"workerRootVolumeSize,omitempty"`
-	WorkerSpotPrice          string            `yaml:"workerSpotPrice,omitempty"`
-	VPCID                    string            `yaml:"vpcId,omitempty"`
-	RouteTableID             string            `yaml:"routeTableId,omitempty"`
-	VPCCIDR                  string            `yaml:"vpcCIDR,omitempty"`
 	InstanceCIDR             string            `yaml:"instanceCIDR,omitempty"`
 	ControllerIP             string            `yaml:"controllerIP,omitempty"`
 	PodCIDR                  string            `yaml:"podCIDR,omitempty"`
@@ -135,7 +125,6 @@ type Cluster struct {
 	K8sVer                   string            `yaml:"kubernetesVersion,omitempty"`
 	HyperkubeImageRepo       string            `yaml:"hyperkubeImageRepo,omitempty"`
 	ContainerRuntime         string            `yaml:"containerRuntime,omitempty"`
-	KMSKeyARN                string            `yaml:"kmsKeyArn,omitempty"`
 	CreateRecordSet          bool              `yaml:"createRecordSet,omitempty"`
 	RecordSetTTL             int               `yaml:"recordSetTTL,omitempty"`
 	TLSCADurationDays        int               `yaml:"tlsCADurationDays,omitempty"`
@@ -144,6 +133,20 @@ type Cluster struct {
 	HostedZoneID             string            `yaml:"hostedZoneId,omitempty"`
 	StackTags                map[string]string `yaml:"stackTags,omitempty"`
 	UseCalico                bool              `yaml:"useCalico,omitempty"`
+
+	// NOT USED
+	KMSKeyARN                string            `yaml:"kmsKeyArn,omitempty"`
+	AvailabilityZone         string            `yaml:"availabilityZone,omitempty"`
+	ControllerRootVolumeType string            `yaml:"controllerRootVolumeType,omitempty"`
+	ControllerRootVolumeIOPS int               `yaml:"controllerRootVolumeIOPS,omitempty"`
+	ControllerRootVolumeSize int               `yaml:"controllerRootVolumeSize,omitempty"`
+	WorkerRootVolumeType     string            `yaml:"workerRootVolumeType,omitempty"`
+	WorkerRootVolumeIOPS     int               `yaml:"workerRootVolumeIOPS,omitempty"`
+	WorkerRootVolumeSize     int               `yaml:"workerRootVolumeSize,omitempty"`
+	WorkerSpotPrice          string            `yaml:"workerSpotPrice,omitempty"`
+	VPCID                    string            `yaml:"vpcId,omitempty"`
+	RouteTableID             string            `yaml:"routeTableId,omitempty"`
+	VPCCIDR                  string            `yaml:"vpcCIDR,omitempty"`
 	Subnets                  []Subnet          `yaml:"subnets,omitempty"`
 }
 
@@ -470,7 +473,7 @@ func (c Cluster) valid() error {
 			)
 		}
 	}
-	if c.KeyName == "" {
+	if c.KeyId == "" {
 		return errors.New("keyName must be set")
 	}
 	if c.Region == "" {

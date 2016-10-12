@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/coreos/coreos-kubernetes/multi-node/aws/pkg/config"
+	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/config"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -283,16 +283,16 @@ func TestValidateKeyPair(t *testing.T) {
 
 	ec2Svc := dummyEC2Service{}
 	ec2Svc.KeyPairs = map[string]bool{
-		c.KeyName: true,
+		c.KeyId: true,
 	}
 
 	if err := c.validateKeyPair(ec2Svc); err != nil {
 		t.Errorf("returned an error for valid key")
 	}
 
-	c.KeyName = "invalidKeyName"
+	c.KeyId = "invalidKeyName"
 	if err := c.validateKeyPair(ec2Svc); err == nil {
-		t.Errorf("failed to catch invalid key \"%s\"", c.KeyName)
+		t.Errorf("failed to catch invalid key \"%s\"", c.KeyId)
 	}
 }
 

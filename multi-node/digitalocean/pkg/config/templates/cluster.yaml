@@ -31,65 +31,22 @@ externalDNSName: {{.ExternalDNSName}}
 
 # Name of the SSH keypair already loaded into the AWS
 # account being used to deploy this cluster.
-keyName: {{.KeyName}}
+keyId: {{.KeyId}}
 
 # Region to provision Kubernetes cluster
 region: {{.Region}}
 
-# Availability Zone to provision Kubernetes cluster when placing nodes in a single availability zone (not highly-available) Comment out for multi availability zone setting and use the below `subnets` section instead.
-availabilityZone: {{.AvailabilityZone}}
-
-# ARN of the KMS key used to encrypt TLS assets.
-kmsKeyArn: "{{.KMSKeyARN}}"
-
 # Instance type for controller node
-#controllerInstanceType: m3.medium
-
-# Disk size (GiB) for controller node
-#controllerRootVolumeSize: 30
-
-# Disk type for controller node (one of standard, io1, or gp2)
-#controllerRootVolumeType: gp2
-
-# Number of I/O operations per second (IOPS) that the controller node disk supports. Leave blank if controllerRootVolumeType is not io1
-#controllerRootVolumeIOPS: 0
+#controllerInstanceType: 2gb
 
 # Number of worker nodes to create
 #workerCount: 1
 
 # Instance type for worker nodes
-#workerInstanceType: m3.medium
-
-# Disk size (GiB) for worker nodes
-#workerRootVolumeSize: 30
-
-# Disk type for worker node (one of standard, io1, or gp2)
-#workerRootVolumeType: gp2
-
-# Number of I/O operations per second (IOPS) that the worker node disk supports. Leave blank if workerRootVolumeType is not io1
-#workerRootVolumeIOPS: 0
-
-# Price (Dollars) to bid for spot instances. Omit for on-demand instances.
-# workerSpotPrice: "0.05"
-
-# ID of existing VPC to create subnet in. Leave blank to create a new VPC
-# vpcId:
-
-# ID of existing route table in existing VPC to attach subnet to. Leave blank to use the VPC's main route table.
-# routeTableId:
-
-# CIDR for Kubernetes VPC. If vpcId is specified, must match the CIDR of existing vpc.
-# vpcCIDR: "10.0.0.0/16"
+#workerInstanceType: 2gb
 
 # CIDR for Kubernetes subnet when placing nodes in a single availability zone (not highly-available) Leave commented out for multi availability zone setting and use the below `subnets` section instead.
 # instanceCIDR: "10.0.0.0/24"
-
-# Kubernetes subnets with their CIDRs and availability zones. Differentiating availability zone for 2 or more subnets result in high-availability (failures of a single availability zone won't result in immediate downtimes)
-# subnets:
-#   - availabilityZone: us-west-1a
-#     instanceCIDR: "10.0.0.0/24"
-#   - availabilityZone: us-west-1b
-#     instanceCIDR: "10.0.1.0/24"
 
 # IP Address for the controller in Kubernetes subnet. When we have 2 or more subnets, the controller is placed in the first subnet and controllerIP must be included in the instanceCIDR of the first subnet. This convention will change once we have H/A controllers
 # controllerIP: 10.0.0.50
@@ -106,8 +63,8 @@ kmsKeyArn: "{{.KMSKeyARN}}"
 # Expiration in days from creation time of TLS assets. By default, the CA will
 # expire in 10 years and the server and client certificates will expire in 1
 # year.
-#tlsCADurationDays: 3650
-#tlsCertDurationDays: 365
+# tlsCADurationDays: 3650
+# tlsCertDurationDays: 365
 
 # Version of hyperkube image to use. This is the tag for the hyperkube image repository.
 # kubernetesVersion: v1.4.0_coreos.0

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/coreos/coreos-kubernetes/multi-node/aws/pkg/config"
+	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -27,10 +27,8 @@ func init() {
 	cmdRoot.AddCommand(cmdInit)
 	cmdInit.Flags().StringVar(&initOpts.ClusterName, "cluster-name", "", "The name of this cluster. This will be the name of the cloudformation stack")
 	cmdInit.Flags().StringVar(&initOpts.ExternalDNSName, "external-dns-name", "", "The hostname that will route to the api server")
-	cmdInit.Flags().StringVar(&initOpts.Region, "region", "", "The AWS region to deploy to")
-	cmdInit.Flags().StringVar(&initOpts.AvailabilityZone, "availability-zone", "", "The AWS availability-zone to deploy to")
-	cmdInit.Flags().StringVar(&initOpts.KeyName, "key-name", "", "The AWS key-pair for ssh access to nodes")
-	cmdInit.Flags().StringVar(&initOpts.KMSKeyARN, "kms-key-arn", "", "The ARN of the AWS KMS key for encrypting TLS assets")
+	cmdInit.Flags().StringVar(&initOpts.Region, "region", "", "The DigitalOcean region to deploy to")
+	cmdInit.Flags().StringVar(&initOpts.KeyId, "key-id", "", "The DigitalOcean key-pair for ssh access to nodes")
 }
 
 func runCmdInit(cmd *cobra.Command, args []string) error {
@@ -41,9 +39,7 @@ func runCmdInit(cmd *cobra.Command, args []string) error {
 		{"--cluster-name", initOpts.ClusterName},
 		{"--external-dns-name", initOpts.ExternalDNSName},
 		{"--region", initOpts.Region},
-		{"--availability-zone", initOpts.AvailabilityZone},
-		{"--key-name", initOpts.KeyName},
-		{"--kms-key-arn", initOpts.KMSKeyARN},
+		{"--key-id", initOpts.KeyId},
 	}
 	var missing []string
 	for _, req := range required {

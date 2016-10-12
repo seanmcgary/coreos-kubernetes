@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/route53"
 
-	"github.com/coreos/coreos-kubernetes/multi-node/aws/pkg/config"
+	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/config"
 )
 
 // VERSION set by build script
@@ -301,13 +301,13 @@ func (c *Cluster) Destroy() error {
 
 func (c *Cluster) validateKeyPair(ec2Svc ec2Service) error {
 	_, err := ec2Svc.DescribeKeyPairs(&ec2.DescribeKeyPairsInput{
-		KeyNames: []*string{aws.String(c.KeyName)},
+		KeyNames: []*string{aws.String(c.KeyId)},
 	})
 
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == "InvalidKeyPair.NotFound" {
-				return fmt.Errorf("Key %s does not exist.", c.KeyName)
+				return fmt.Errorf("Key %s does not exist.", c.KeyId)
 			}
 		}
 		return err
