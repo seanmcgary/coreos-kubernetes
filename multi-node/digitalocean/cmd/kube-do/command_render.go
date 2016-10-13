@@ -73,6 +73,7 @@ func runCmdRender(cmd *cobra.Command, args []string) error {
 		{"userdata/cloud-config-controller", config.CloudConfigController, 0644},
 		{"userdata/cloud-config-worker", config.CloudConfigWorker, 0644},
 		{"stack-template.json", config.StackTemplateTemplate, 0644},
+		{"do-template.json", config.DoTemplateTemplate, 0644},
 		{"kubeconfig", kubeconfig.Bytes(), 0600},
 	}
 	for _, file := range files {

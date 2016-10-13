@@ -38,6 +38,7 @@ var files = []struct {
 	{"cluster.yaml", "DefaultClusterConfig"},
 	{"kubeconfig.tmpl", "KubeConfigTemplate"},
 	{"stack-template.json", "StackTemplateTemplate"},
+	{"do-template.json", "DoTemplateTemplate"},
 }
 
 type Data struct {

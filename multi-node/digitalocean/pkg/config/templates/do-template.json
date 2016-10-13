@@ -1,0 +1,16 @@
+{
+	"ClusterName": "{{.ClusterName}}",
+	"SshKeyId": "{{.KeyId}}",
+	"Contoller": {
+		"Region": "{{.Region}}",
+		"Channel": "coreos-{{.ReleaseChannel}}",
+		"InstanceType": "{{.ControllerInstanceType}}",
+		"Count": 1
+	},
+	"Worker": {
+		"Region": "{{.Region}}",
+		"Channel": "coreos-{{.ReleaseChannel}}",
+		"InstanceType": "{{.ControllerInstanceType}}",
+		"Count": {{.WorkerCount}}
+	}
+}

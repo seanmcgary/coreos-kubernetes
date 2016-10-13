@@ -18,6 +18,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 
+	//"github.com/digitalocean/godo"
+
 	"github.com/coreos/coreos-cloudinit/config/validate"
 	"github.com/coreos/coreos-kubernetes/multi-node/digitalocean/pkg/coreosutil"
 	"github.com/coreos/go-semver/semver"
@@ -108,46 +110,46 @@ func ClusterFromBytes(data []byte) (*Cluster, error) {
 }
 
 type Cluster struct {
-	ClusterName              string            `yaml:"clusterName,omitempty"`
-	ExternalDNSName          string            `yaml:"externalDNSName,omitempty"`
-	KeyId                    string            `yaml:"keyId,omitempty"`
-	Region                   string            `yaml:"region,omitempty"`
-	ReleaseChannel           string            `yaml:"releaseChannel,omitempty"`
-	ControllerInstanceType   string            `yaml:"controllerInstanceType,omitempty"`
+	ClusterName            string `yaml:"clusterName,omitempty"`
+	ExternalDNSName        string `yaml:"externalDNSName,omitempty"`
+	KeyId                  string `yaml:"keyId,omitempty"`
+	Region                 string `yaml:"region,omitempty"`
+	ReleaseChannel         string `yaml:"releaseChannel,omitempty"`
+	ControllerInstanceType string `yaml:"controllerInstanceType,omitempty"`
 
-	WorkerCount              int               `yaml:"workerCount,omitempty"`
-	WorkerInstanceType       string            `yaml:"workerInstanceType,omitempty"`
-	InstanceCIDR             string            `yaml:"instanceCIDR,omitempty"`
-	ControllerIP             string            `yaml:"controllerIP,omitempty"`
-	PodCIDR                  string            `yaml:"podCIDR,omitempty"`
-	ServiceCIDR              string            `yaml:"serviceCIDR,omitempty"`
-	DNSServiceIP             string            `yaml:"dnsServiceIP,omitempty"`
-	K8sVer                   string            `yaml:"kubernetesVersion,omitempty"`
-	HyperkubeImageRepo       string            `yaml:"hyperkubeImageRepo,omitempty"`
-	ContainerRuntime         string            `yaml:"containerRuntime,omitempty"`
-	CreateRecordSet          bool              `yaml:"createRecordSet,omitempty"`
-	RecordSetTTL             int               `yaml:"recordSetTTL,omitempty"`
-	TLSCADurationDays        int               `yaml:"tlsCADurationDays,omitempty"`
-	TLSCertDurationDays      int               `yaml:"tlsCertDurationDays,omitempty"`
-	HostedZone               string            `yaml:"hostedZone,omitempty"`
-	HostedZoneID             string            `yaml:"hostedZoneId,omitempty"`
-	StackTags                map[string]string `yaml:"stackTags,omitempty"`
-	UseCalico                bool              `yaml:"useCalico,omitempty"`
+	WorkerCount         int               `yaml:"workerCount,omitempty"`
+	WorkerInstanceType  string            `yaml:"workerInstanceType,omitempty"`
+	InstanceCIDR        string            `yaml:"instanceCIDR,omitempty"`
+	ControllerIP        string            `yaml:"controllerIP,omitempty"`
+	PodCIDR             string            `yaml:"podCIDR,omitempty"`
+	ServiceCIDR         string            `yaml:"serviceCIDR,omitempty"`
+	DNSServiceIP        string            `yaml:"dnsServiceIP,omitempty"`
+	K8sVer              string            `yaml:"kubernetesVersion,omitempty"`
+	HyperkubeImageRepo  string            `yaml:"hyperkubeImageRepo,omitempty"`
+	ContainerRuntime    string            `yaml:"containerRuntime,omitempty"`
+	CreateRecordSet     bool              `yaml:"createRecordSet,omitempty"`
+	RecordSetTTL        int               `yaml:"recordSetTTL,omitempty"`
+	TLSCADurationDays   int               `yaml:"tlsCADurationDays,omitempty"`
+	TLSCertDurationDays int               `yaml:"tlsCertDurationDays,omitempty"`
+	HostedZone          string            `yaml:"hostedZone,omitempty"`
+	HostedZoneID        string            `yaml:"hostedZoneId,omitempty"`
+	StackTags           map[string]string `yaml:"stackTags,omitempty"`
+	UseCalico           bool              `yaml:"useCalico,omitempty"`
 
 	// NOT USED
-	KMSKeyARN                string            `yaml:"kmsKeyArn,omitempty"`
-	AvailabilityZone         string            `yaml:"availabilityZone,omitempty"`
-	ControllerRootVolumeType string            `yaml:"controllerRootVolumeType,omitempty"`
-	ControllerRootVolumeIOPS int               `yaml:"controllerRootVolumeIOPS,omitempty"`
-	ControllerRootVolumeSize int               `yaml:"controllerRootVolumeSize,omitempty"`
-	WorkerRootVolumeType     string            `yaml:"workerRootVolumeType,omitempty"`
-	WorkerRootVolumeIOPS     int               `yaml:"workerRootVolumeIOPS,omitempty"`
-	WorkerRootVolumeSize     int               `yaml:"workerRootVolumeSize,omitempty"`
-	WorkerSpotPrice          string            `yaml:"workerSpotPrice,omitempty"`
-	VPCID                    string            `yaml:"vpcId,omitempty"`
-	RouteTableID             string            `yaml:"routeTableId,omitempty"`
-	VPCCIDR                  string            `yaml:"vpcCIDR,omitempty"`
-	Subnets                  []Subnet          `yaml:"subnets,omitempty"`
+	KMSKeyARN                string   `yaml:"kmsKeyArn,omitempty"`
+	AvailabilityZone         string   `yaml:"availabilityZone,omitempty"`
+	ControllerRootVolumeType string   `yaml:"controllerRootVolumeType,omitempty"`
+	ControllerRootVolumeIOPS int      `yaml:"controllerRootVolumeIOPS,omitempty"`
+	ControllerRootVolumeSize int      `yaml:"controllerRootVolumeSize,omitempty"`
+	WorkerRootVolumeType     string   `yaml:"workerRootVolumeType,omitempty"`
+	WorkerRootVolumeIOPS     int      `yaml:"workerRootVolumeIOPS,omitempty"`
+	WorkerRootVolumeSize     int      `yaml:"workerRootVolumeSize,omitempty"`
+	WorkerSpotPrice          string   `yaml:"workerSpotPrice,omitempty"`
+	VPCID                    string   `yaml:"vpcId,omitempty"`
+	RouteTableID             string   `yaml:"routeTableId,omitempty"`
+	VPCCIDR                  string   `yaml:"vpcCIDR,omitempty"`
+	Subnets                  []Subnet `yaml:"subnets,omitempty"`
 }
 
 type Subnet struct {
@@ -187,24 +189,6 @@ func (c Cluster) Config() (*Config, error) {
 		if !ok {
 			return nil, fmt.Errorf("The container runtime is 'rkt' but the latest CoreOS version for the %s channel is less then the minimum version %s. Please select the 'alpha' release channel to use the rkt runtime.", config.ReleaseChannel, minVersion)
 		}
-	}
-
-	/*
-	var err error
-	if config.AMI, err = getAMI(config.Region, config.ReleaseChannel); err != nil {
-		return nil, fmt.Errorf("failed getting AMI for config: %v", err)
-	}*/
-
-	//Set logical name constants
-	config.VPCLogicalName = vpcLogicalName
-
-	//Set reference strings
-
-	//Assume VPC does not exist, reference by logical name
-	config.VPCRef = fmt.Sprintf(`{ "Ref" : %q }`, config.VPCLogicalName)
-	if config.VPCID != "" {
-		//This means this VPC already exists, and we can reference it directly by ID
-		config.VPCRef = fmt.Sprintf("%q", config.VPCID)
 	}
 
 	return &config, nil
